@@ -76,16 +76,54 @@ def check_win():
 
 
 def draw_bulb(cx, cy, is_on):
-    # TODO: Render bulb graphics using line & ellipse (To be implemented in Commit 3)
-    pass
+    # Set background and bulb colors based on light state
+    if is_on:
+        bg_col = color(255, 220, 80)    # Active cell background (Yellow)
+        bulb_col = color(255, 255, 200) # Active bulb center (Bright White-Yellow)
+    else:
+        bg_col = color(50)             # Inactive cell background (Dark Grey)
+        bulb_col = color(90)           # Inactive bulb center (Dim Grey)
+
+    # 1. Fill cell background using horizontal line scanlines (No rect permitted)
+    stroke(bg_col)
+    i = 0
+    while i < CELL_SIZE:
+        line(cx, cy + i, cx + CELL_SIZE, cy + i)
+        i += 1
+
+    # 2. Draw central bulb shape using ellipse (Complies with line & ellipse requirement)
+    fill(bulb_col)
+    stroke(30)
+    ellipse(cx + CELL_SIZE / 2, cy + CELL_SIZE / 2, 40, 40)
+
+    # 3. Render cell outer borders using line primitives
+    stroke(20)
+    line(cx, cy, cx + CELL_SIZE, cy)                          # Top border
+    line(cx, cy + CELL_SIZE, cx + CELL_SIZE, cy + CELL_SIZE)  # Bottom border
+    line(cx, cy, cx, cy + CELL_SIZE)                          # Left border
+    line(cx + CELL_SIZE, cy, cx + CELL_SIZE, cy + CELL_SIZE)  # Right border
 
 
 def draw_grid_recursive(r, c):
+    # Base case: stop recursion when all rows are drawn
     if r >= ROWS:
         return
     else:
-        # TODO: Render grid recursively (To be implemented in Commit 3)
-        pass
+        x = c * CELL_SIZE
+        y = r * CELL_SIZE
+
+        if grid[r][c] == 1:
+            is_on = True
+        else:
+            is_on = False
+
+        draw_bulb(x, y, is_on)
+
+        # Recurse to next column or move down to next row
+        if c + 1 >= COLS:
+            draw_grid_recursive(r + 1, 0)
+        else:
+            draw_grid_recursive(r, c + 1)
 
 
 def draw():
