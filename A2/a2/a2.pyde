@@ -76,7 +76,6 @@ def check_win():
 
 
 def draw_bulb(cx, cy, is_on):
-    # Set background and bulb colors based on light state
     if is_on:
         bg_col = color(255, 220, 80)    # Active cell background (Yellow)
         bulb_col = color(255, 255, 200) # Active bulb center (Bright White-Yellow)
@@ -84,14 +83,14 @@ def draw_bulb(cx, cy, is_on):
         bg_col = color(50)             # Inactive cell background (Dark Grey)
         bulb_col = color(90)           # Inactive bulb center (Dim Grey)
 
-    # 1. Fill cell background using horizontal line scanlines (No rect permitted)
+    # 1. Fill cell interior using horizontal line scanlines
     stroke(bg_col)
     i = 0
     while i < CELL_SIZE:
         line(cx, cy + i, cx + CELL_SIZE, cy + i)
         i += 1
 
-    # 2. Draw central bulb shape using ellipse (Complies with line & ellipse requirement)
+    # 2. Draw central bulb shape using ellipse
     fill(bulb_col)
     stroke(30)
     ellipse(cx + CELL_SIZE / 2, cy + CELL_SIZE / 2, 40, 40)
@@ -105,7 +104,6 @@ def draw_bulb(cx, cy, is_on):
 
 
 def draw_grid_recursive(r, c):
-    # Base case: stop recursion when all rows are drawn
     if r >= ROWS:
         return
     else:
@@ -119,7 +117,6 @@ def draw_grid_recursive(r, c):
 
         draw_bulb(x, y, is_on)
 
-        # Recurse to next column or move down to next row
         if c + 1 >= COLS:
             draw_grid_recursive(r + 1, 0)
         else:
@@ -133,17 +130,26 @@ def draw():
 
 def mousePressed():
     global moves, game_over
+
+    # Stop accepting board clicks when game is already won
     if game_over:
         return
     else:
-        c = mouseX // CELL_SIZE
-        r = mouseY // CELL_SIZE
-        if 0 <= r < ROWS and 0 <= c < COLS:
-            toggle(r, c)
-            moves += 1
-            if check_win():
-                game_over = True
-            else:
-                pass
+        pass
+
+    # Translate mouse screen coordinates into grid array indices
+    c = mouseX // CELL_SIZE
+    r = mouseY // CELL_SIZE
+
+    # Boundary Guard: Ensure click is inside valid grid coordinates
+    if 0 <= r < ROWS and 0 <= c < COLS:
+        toggle(r, c)
+        moves += 1
+
+        # Check for victory condition after every move
+        if check_win():
+            game_over = True
         else:
             pass
+    else:
+        pass
