@@ -17,6 +17,7 @@ BTN_H = 30
 
 
 def setup():
+    # Set canvas window size with extra 50px space at bottom for UI panel
     size(COLS * CELL_SIZE, ROWS * CELL_SIZE + 50)
     reset_game()
 
@@ -76,6 +77,7 @@ def check_win():
 
 
 def draw_bulb(cx, cy, is_on):
+    # Set background and bulb colors based on light state
     if is_on:
         bg_col = color(255, 220, 80)    # Active cell background (Yellow)
         bulb_col = color(255, 255, 200) # Active bulb center (Bright White-Yellow)
@@ -127,28 +129,111 @@ def draw():
     background(30)
     draw_grid_recursive(0, 0)
 
+    # ------------------ Bottom UI Panel ------------------
+    fill(20)
+    noStroke()
+    rect(0, ROWS * CELL_SIZE, width, 50)
+
+    # Render current move count and best score
+    fill(255)
+    textSize(15)
+    textAlign(LEFT, CENTER)
+    text("Moves: " + str(moves), 15, ROWS * CELL_SIZE + 25)
+
+    if best_moves is not None:
+        best_str = str(best_moves)
+    else:
+        best_str = "-"
+
+    text("Best: " + best_str, 135, ROWS * CELL_SIZE + 25)
+
+    # Render RESET button with hover color effect
+    if BTN_X <= mouseX <= BTN_X + BTN_W and BTN_Y <= mouseY <= BTN_Y + BTN_H:
+        fill(220, 60, 60)  # Bright red on hover
+    else:
+        fill(180, 40, 40)  # Default red
+
+    rect(BTN_X, BTN_Y, BTN_W, BTN_H, 6)
+
+    fill(255)
+    textSize(13)
+    textAlign(CENTER, CENTER)
+    text("RESET", BTN_X + BTN_W / 2, BTN_Y + BTN_H / 2)
+
+    # ------------------ Win Overlay Screen ------------------
+    if game_over:
+        fill(0, 220)
+        rect(0, 0, width, height)
+
+        fill(255, 215, 0)
+        textAlign(CENTER, CENTER)
+        textSize(32)
+        text("YOU WIN!", width / 2, height / 2 - 50)
+
+        fill(255)
+        textSize(18)
+        text("Moves used: " + str(moves), width / 2, height / 2 - 10)
+        text("Best Score: " + str(best_moves), width / 2, height / 2 + 20)
+
+        # Render NEXT GAME button
+        play_x = width / 2 - 60
+        play_y = height / 2 + 65
+        play_w = 120
+        play_h = 35
+
+        if play_x <= mouseX <= play_x + play_w and play_y <= mouseY <= play_y + play_h:
+            fill(90, 200, 100)  # Bright green on hover
+        else:
+            fill(60, 160, 70)   # Default green
+
+        rect(play_x, play_y, play_w, play_h, 6)
+
+        fill(255)
+        textSize(14)
+        text("NEXT GAME", width / 2, play_y + play_h / 2)
+    else:
+        pass
+
 
 def mousePressed():
-    global moves, game_over
+    global moves, game_over, best_moves
 
-    # Stop accepting board clicks when game is already won
-    if game_over:
+    # Handle bottom UI RESET button click
+    if BTN_X <= mouseX <= BTN_X + BTN_W and BTN_Y <= mouseY <= BTN_Y + BTN_H:
+        reset_game()
         return
     else:
         pass
 
-    # Translate mouse screen coordinates into grid array indices
+    # Handle NEXT GAME button click on win overlay
+    if game_over:
+        play_x = width / 2 - 60
+        play_y = height / 2 + 65
+        play_w = 120
+        play_h = 35
+
+        if play_x <= mouseX <= play_x + play_w and play_y <= mouseY <= play_y + play_h:
+            reset_game()
+        else:
+            pass
+        return
+    else:
+        pass
+
+    # Handle grid cell interaction during active gameplay
     c = mouseX // CELL_SIZE
     r = mouseY // CELL_SIZE
 
-    # Boundary Guard: Ensure click is inside valid grid coordinates
     if 0 <= r < ROWS and 0 <= c < COLS:
         toggle(r, c)
         moves += 1
 
-        # Check for victory condition after every move
         if check_win():
             game_over = True
+            if best_moves is None or moves < best_moves:
+                best_moves = moves
+            else:
+                pass
         else:
             pass
     else:
