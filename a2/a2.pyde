@@ -93,8 +93,7 @@ def save_game(filename="save.txt"):
                     row_str += str(grid[r][c])
                     if c < COLS - 1:
                         row_str += " "
-                    else:
-                        pass
+                        
                     c += 1
                 f.write(row_str + "\n")
                 r += 1
@@ -152,12 +151,12 @@ def toggle(r, c):
         while i < len(positions):
             nr, nc = positions[i]
             if 0 <= nr < ROWS and 0 <= nc < COLS:
-                grid[nr][nc] = 1 - grid[nr][nc]
-            else:
-                pass
+                if grid[nr][nc] == 0: #simplify grid[nr][nc] = 1 - grid[nr][nc]
+                    grid[nr][nc] = 1
+                else:
+                    grid[nr][nc] = 0
             i += 1
-    else:
-        pass
+
 
 
 def check_win():
@@ -223,13 +222,11 @@ def draw():
     # Reset button status color feedback after 1000ms (1 second)
     if millis() - save_timer > 1000:
         save_status = 0
-    else:
-        pass
+
 
     if millis() - load_timer > 1000:
         load_status = 0
-    else:
-        pass
+
 
     # ------------------ Bottom Control Panel UI ------------------
     fill(20)
@@ -261,7 +258,7 @@ def draw():
             else:
                 fill(40, 100, 180)  # Default blue
 
-    rect(BTN_SAVE_X, BTN_SAVE_Y, BTN_SAVE_W, BTN_SAVE_H, 5)
+    rect(BTN_SAVE_X, BTN_SAVE_Y, BTN_SAVE_W, BTN_SAVE_H, 0)
     fill(255)
     textAlign(CENTER, CENTER)
     text("SAVE", BTN_SAVE_X + BTN_SAVE_W / 2, BTN_SAVE_Y + BTN_SAVE_H / 2)
@@ -278,7 +275,7 @@ def draw():
             else:
                 fill(180, 120, 40)  # Default orange
 
-    rect(BTN_LOAD_X, BTN_LOAD_Y, BTN_LOAD_W, BTN_LOAD_H, 5)
+    rect(BTN_LOAD_X, BTN_LOAD_Y, BTN_LOAD_W, BTN_LOAD_H, 0)
     fill(255)
     textAlign(CENTER, CENTER)
     text("LOAD", BTN_LOAD_X + BTN_LOAD_W / 2, BTN_LOAD_Y + BTN_LOAD_H / 2)
@@ -288,7 +285,7 @@ def draw():
         fill(220, 60, 60)
     else:
         fill(180, 40, 40)
-    rect(BTN_RESET_X, BTN_RESET_Y, BTN_RESET_W, BTN_RESET_H, 5)
+    rect(BTN_RESET_X, BTN_RESET_Y, BTN_RESET_W, BTN_RESET_H, 0)
     fill(255)
     textAlign(CENTER, CENTER)
     text("RESET", BTN_RESET_X + BTN_RESET_W / 2, BTN_RESET_Y + BTN_RESET_H / 2)
@@ -318,13 +315,11 @@ def draw():
         else:
             fill(60, 160, 70)
 
-        rect(play_x, play_y, play_w, play_h, 6)
+        rect(play_x, play_y, play_w, play_h, 0)
 
         fill(255)
         textSize(14)
         text("NEXT GAME", width / 2, play_y + play_h / 2)
-    else:
-        pass
 
 
 def mousePressed():
@@ -334,22 +329,18 @@ def mousePressed():
     if BTN_SAVE_X <= mouseX <= BTN_SAVE_X + BTN_SAVE_W and BTN_SAVE_Y <= mouseY <= BTN_SAVE_Y + BTN_SAVE_H:
         save_game()
         return
-    else:
-        pass
+
 
     # Handle LOAD button click
     if BTN_LOAD_X <= mouseX <= BTN_LOAD_X + BTN_LOAD_W and BTN_LOAD_Y <= mouseY <= BTN_LOAD_Y + BTN_LOAD_H:
         load_game()
         return
-    else:
-        pass
+
 
     # Handle RESET button click
     if BTN_RESET_X <= mouseX <= BTN_RESET_X + BTN_RESET_W and BTN_RESET_Y <= mouseY <= BTN_RESET_Y + BTN_RESET_H:
         reset_game()
         return
-    else:
-        pass
 
     # Handle NEXT GAME button click when in win screen
     if game_over:
@@ -360,12 +351,7 @@ def mousePressed():
 
         if play_x <= mouseX <= play_x + play_w and play_y <= mouseY <= play_y + play_h:
             reset_game()
-        else:
-            pass
         return
-    else:
-        pass
-
     # Handle grid cell toggling during active game loop
     c = mouseX // CELL_SIZE
     r = mouseY // CELL_SIZE
@@ -378,12 +364,6 @@ def mousePressed():
             game_over = True
             if best_moves is None or moves < best_moves:
                 best_moves = moves
-            else:
-                pass
-        else:
-            pass
-    else:
-        pass
 
 
 def keyPressed():
@@ -393,5 +373,3 @@ def keyPressed():
     else:
         if key == 'l' or key == 'L':
             load_game()
-        else:
-            pass
